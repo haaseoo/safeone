@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=rfi2j2vonm"></script>
+    <style>
+      html,
+      body,
+      #map {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      if (!window.naver) {
+        window.ReactNativeWebView?.postMessage(
+          JSON.stringify({type: 'sdk-load-failed'}),
+        );
+      } else {
+        window.ReactNativeWebView?.postMessage(
+          JSON.stringify({type: 'sdk-load-success'}),
+        );
+      }
+
+      window.addEventListener('message', function (event) {
+        const data = JSON.parse(event.data);
+        if (data.type === 'location') {
+          const lat = data.lat;
+          const lon = data.lon;
+
+          console.log('📩 위치 데이터 받음:', lat, lon); // ✅ 추가
+
+          const map = new naver.maps.Map('map', {
+            center: new naver.maps.LatLng(lat, lon),
+            zoom: 16,
+          });
+
+          const marker = new naver.maps.Marker({
+            position: new naver.maps.LatLng(lat, lon),
+            map: map,
+          });
+
+          window.ReactNativeWebView?.postMessage(
+            JSON.stringify({type: 'success', message: '지도 생성 완료'}),
+          );
+        }
+      });
+    </script>
+  </body>
+</html>
